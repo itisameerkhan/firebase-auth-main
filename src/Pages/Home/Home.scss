@@ -16,6 +16,8 @@
     height: 75px;
     width: 75px;
     border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
   }
   border: 1px solid #878787;
   padding: 3rem 2rem;
