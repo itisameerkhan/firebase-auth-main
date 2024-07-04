@@ -1,0 +1,36 @@
+.home {
+  width: 100%;
+  background-color: white;
+  color: black;
+  padding: 2rem 3rem;
+}
+.home-main {
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+.home-display-1 {
+  img {
+    height: 75px;
+    width: 75px;
+    border-radius: 50%;
+  }
+  border: 1px solid #878787;
+  padding: 3rem 2rem;
+  margin: 4rem 0rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  border-radius: 10px;
+}
+.home-display-2 {
+  border: 1px solid #878787;
+  padding: 3rem 2rem;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
