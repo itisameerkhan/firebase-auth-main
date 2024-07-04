@@ -1,6 +1,6 @@
 import "./Home.scss";
 import { useEffect, useState } from "react";
-import { auth } from "../../../something/config/firebase";
+import { auth } from "../../config/firebase";
 import {
   updateProfile,
   signOut,
