@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./style.scss";
 import { TextField, Button, FormControlLabel, Checkbox } from "@mui/material";
-import { auth, googleProvider } from "./config/firebase";
+import { auth, googleProvider } from "../something/config/firebase";
 import {
   AuthErrorCodes,
   createUserWithEmailAndPassword,
