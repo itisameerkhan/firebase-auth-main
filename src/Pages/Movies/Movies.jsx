@@ -1,6 +1,6 @@
 import "./Movies.scss";
 import { useEffect, useState } from "react";
-import { db, auth } from "../../config/firebase";
+import { db, auth, storage } from "../../config/firebase";
 import {
   getDocs,
   collection,
@@ -23,8 +23,12 @@ import {
   LinearProgress,
   Snackbar,
 } from "@mui/material";
+import { onAuthStateChanged } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { ref, uploadBytes, getStorage } from "firebase/storage";
 
 const Movies = () => {
+  const navigate = useNavigate();
   const [movieList, setMovieList] = useState([]);
   const [movieData, setMovieData] = useState({
     title: "",
@@ -36,6 +40,7 @@ const Movies = () => {
     userId: "",
   });
 
+  const [fileUpload, setFileUpload] = useState(null);
   const [updateData, setUpdateData] = useState({
     title: "",
     description: "",
@@ -103,6 +108,27 @@ const Movies = () => {
     }
   };
 
+  const handleUploadFile = async () => {
+    if (!fileUpload) {
+      setSnackStatus({
+        open: true,
+        message: "No file were detected",
+      });
+      return;
+    }
+    const fileFolderRef = ref(storage, `projectFiles/${fileUpload.name}`);
+    try {
+      const response = await uploadBytes(fileFolderRef, fileUpload);
+      console.log(response);
+      setSnackStatus({
+        open: true,
+        message: "File Uploaded successfull",
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   const handleChange = (e) => {
     setMovieData({
       ...movieData,
@@ -144,6 +170,12 @@ const Movies = () => {
   };
 
   useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        console.log("YOU HAVE BEEN LOGGED OUT!");
+        navigate("/");
+      }
+    });
     getMovieData();
   }, []);
 
@@ -185,16 +217,20 @@ const Movies = () => {
           value={movieData.description}
           onChange={handleChange}
         />
-        <TextField
-          id="outlined-basic-4"
-          label="poster Image"
-          variant="outlined"
-          name="poster_img"
-          type="text"
-          required
-          value={movieData.poster_img}
-          onChange={handleChange}
-        />
+        <div className="form-img">
+          <TextField
+            id="outlined-basic-4"
+            variant="outlined"
+            name="poster_img"
+            type="file"
+            required
+            onChange={(e) => setFileUpload(e.target.files[0])}
+            className="form-img-input"
+          />
+          <Button variant="contained" onClick={handleUploadFile}>
+            SUBMIT
+          </Button>
+        </div>
         <TextField
           id="outlined-basic-4"
           label="IMDB"
