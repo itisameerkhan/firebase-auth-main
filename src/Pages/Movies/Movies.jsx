@@ -1,12 +1,13 @@
 import "./Movies.scss";
 import { useEffect, useState } from "react";
-import { db } from "../../config/firebase";
+import { db, auth } from "../../config/firebase";
 import {
   getDocs,
   collection,
   addDoc,
   deleteDoc,
   doc,
+  updateDoc,
 } from "firebase/firestore";
 import {
   Typography,
@@ -21,7 +22,6 @@ import {
   Box,
   LinearProgress,
   Snackbar,
-  Dialog,
 } from "@mui/material";
 
 const Movies = () => {
@@ -33,6 +33,7 @@ const Movies = () => {
     IMDB: 0,
     isAvailable: true,
     releaseDate: 0,
+    userId: "",
   });
 
   const [updateData, setUpdateData] = useState({
@@ -42,6 +43,11 @@ const Movies = () => {
     IMDB: 0,
     isAvailable: true,
     releaseDate: 0,
+    userId: "",
+  });
+
+  const [updatedData, setUpdatedData] = useState({
+    title: "",
   });
 
   const [snackStatus, setSnackStatus] = useState({
@@ -59,11 +65,6 @@ const Movies = () => {
     });
   };
 
-  const handleDialogClose = () => {
-    setDialogStatus({
-      open: false,
-    });
-  };
   const moviesCollectionRef = collection(db, "movies");
 
   const getMovieData = async () => {
@@ -82,7 +83,12 @@ const Movies = () => {
   };
 
   const handleSubmit = async () => {
-    console.log(movieData);
+    setMovieData({
+      ...movieData,
+      userId: auth.currentUser.uid,
+    });
+
+    console.log("user", auth?.currentUser?.uid);
     try {
       const response = await addDoc(moviesCollectionRef, movieData);
       console.log(response);
@@ -122,7 +128,20 @@ const Movies = () => {
     }
   };
 
-  const updateMovie = async () => {};
+  const handleUpdatedData = async (movieID) => {
+    const reference = doc(db, "movies", movieID);
+    await updateDoc(reference, {
+      title: updatedData.title,
+    });
+    getMovieData();
+    setSnackStatus({
+      open: true,
+      message: "Movie Updated",
+    });
+    setUpdatedData({
+      title: "",
+    });
+  };
 
   useEffect(() => {
     getMovieData();
@@ -235,6 +254,25 @@ const Movies = () => {
                   imdb: {data.IMDB} - Release Date: {data.releaseDate}
                 </Typography>
               </CardContent>
+              <div className="update-card">
+                <input
+                  type="text"
+                  placeholder="New title"
+                  required
+                  onChange={(e) =>
+                    setUpdatedData({
+                      ...updatedData,
+                      title: e.target.value,
+                    })
+                  }
+                />
+                <Button
+                  variant="contained"
+                  onClick={() => handleUpdatedData(data.id)}
+                >
+                  UPDATE
+                </Button>
+              </div>
               <CardActions>
                 <Button
                   size="small"
@@ -255,64 +293,6 @@ const Movies = () => {
                 </Button>
               </CardActions>
             </Card>
-            <Dialog open={dialogStatus.open} onClose={handleDialogClose}>
-              <div
-                style={{ padding: "1rem", width: "500px" }}
-                className="dialog-1"
-              >
-                <TextField
-                  id="outlined-basic-4"
-                  label="Title"
-                  variant="outlined"
-                  name="title"
-                  type="text"
-                  required
-                  style={{ width: "100%" }}
-                  value={data.title}
-                />
-                <TextField
-                  id="outlined-basic-4"
-                  label="Description"
-                  variant="outlined"
-                  name="description"
-                  type="text"
-                  required
-                  style={{ width: "100%" }}
-                  value={data.description}
-                />
-                <TextField
-                  id="outlined-basic-4"
-                  label="Poster Image"
-                  variant="outlined"
-                  name="poster_img"
-                  type="text"
-                  required
-                  style={{ width: "100%" }}
-                  value={data.poster_img}
-                />
-                <TextField
-                  id="outlined-basic-4"
-                  label="IMDB"
-                  variant="outlined"
-                  name="IMDB"
-                  type="number"
-                  required
-                  style={{ width: "100%" }}
-                  value={data.IMDB}
-                />
-                <TextField
-                  id="outlined-basic-4"
-                  label="Release Date"
-                  variant="outlined"
-                  name="release_date"
-                  type="text"
-                  required
-                  style={{ width: "100%" }}
-                  value={data.releaseDate}
-                />
-                <Button variant="contained">SUBMIT</Button>
-              </div>
-            </Dialog>
           </div>
         ))}
       </div>

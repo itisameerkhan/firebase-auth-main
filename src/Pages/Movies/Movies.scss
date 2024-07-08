@@ -45,3 +45,13 @@
   gap: 1rem;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
+.update-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  input {
+    padding-left: .5rem;
+    height: 37px;
+    font-size: 1.2rem;
+  }
+}
